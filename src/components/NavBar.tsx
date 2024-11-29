@@ -26,7 +26,7 @@ export default function Navbar({ session }: { session: SessionPayload; }) {
             <Link href="/" className="flex-shrink-0 flex items-center">
               <span className="text-xl font-bold text-gray-800">Echonomy</span>
             </Link>
-            <div className="hidden md:ml-6 md:flex md:space-x-8">
+            <div className="ml-6 flex space-x-8">
               <Link href="/" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-gray-300 hover:text-gray-700">
                 Ingresar gasto
               </Link>
