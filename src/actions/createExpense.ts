@@ -3,6 +3,7 @@
 
 import { pool } from "@/db";
 import { verifySession } from "@/session/session";
+import { revalidatePath } from "next/cache";
 
 export async function createExpense(state: any,data: FormData) {
   const description = data.get('description');
@@ -15,6 +16,7 @@ export async function createExpense(state: any,data: FormData) {
   const result = await pool.query(`INSERT INTO home_expenses (concept, amount, category, author) VALUES ($1, $2, $3, $4)`,[description,amount,category,session?.userId]);
 
   if (result.rowCount) {
+    revalidatePath('/history');
     return { success: true,message: "Gasto agregado correctamente" };
   }
 
