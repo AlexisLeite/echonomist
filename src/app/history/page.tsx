@@ -1,9 +1,9 @@
-'use server';
+"use server";
 
 import ExpensesHistory from "@/components/ExpensesHistory";
-import { getLastExpenses } from "@/actions/getLastExpenses";
+import { verifySession } from "@/session/session";
 
 export default async function History() {
-  const expenses = await getLastExpenses();
-  return <ExpensesHistory expenses={expenses} />;
+  const session = await verifySession();
+  return <ExpensesHistory userId={session.userId as any} />;
 }
