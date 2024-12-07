@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 import localFont from "next/font/local";
 import "./globals.css";
@@ -24,17 +24,17 @@ export default async function RootLayout({
   const session = await verifySession();
 
   return (
-    <html lang="en">
+    <html className="dark" lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center min-h-screen">
           {session.userId !== undefined && <Navbar session={session} />}
           <div className="flex-grow pt-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
             {children}
           </div>
         </div>
       </body>
-    </html >
+    </html>
   );
 }
