@@ -1,12 +1,8 @@
+import { getCategories } from "@/actions/getCategories";
 import { NewExpenseForm } from "@/components/NewExpenseForm";
 
 export default async function Home() {
-  /*const fetchUsers = async () => {
-    const result = await pool.query(`SELECT * FROM users`);
-    return result.rows;
-  };*/
+  const categories = await getCategories();
 
-  return (
-    <NewExpenseForm />
-  );
+  return <NewExpenseForm categories={categories} />;
 }

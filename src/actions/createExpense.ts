@@ -4,7 +4,7 @@ import { pool } from "@/db";
 import { verifySession } from "@/session/session";
 import { revalidatePath } from "next/cache";
 
-export async function createExpense(data: FormData) {
+export async function createExpense(state: any, data: FormData) {
   const description = data.get("description");
   const amount = data.get("amount");
   const category = data.get("category");
@@ -12,8 +12,8 @@ export async function createExpense(data: FormData) {
   const session = await verifySession();
 
   const result = await pool.query(
-    `INSERT INTO home_expenses (concept, amount, category, author) VALUES ($1, $2, $3, $4)`,
-    [description, amount, category, session?.userId],
+    `INSERT INTO expenses (user_id, group_id, concept, amount, category) VALUES ($1, 1, $2, $3, $4)`,
+    [session?.userId, description, amount, category],
   );
 
   if (result.rowCount) {

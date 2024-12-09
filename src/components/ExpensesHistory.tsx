@@ -1,7 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { makeObservable, observable } from "mobx";
+import { makeObservable, observable, toJS } from "mobx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -45,10 +45,6 @@ class HistoryStore {
   }
 
   initialLoad(userId: number) {
-    if (this.state.firstLoaded) {
-      return;
-    }
-    this.state.firstLoaded = true;
     this.state.userId = userId;
     this.loadSevenDays();
   }
@@ -69,7 +65,7 @@ class HistoryStore {
     const user = this.state.loadedExpenses.reduce(
       (sum, expense) =>
         sum +
-        (expense.author == this.state.userId
+        (expense.user_id == this.state.userId
           ? Number.parseInt(String(expense.amount), 10)
           : 0),
       0,
@@ -87,8 +83,7 @@ class HistoryStore {
 
 const store = new HistoryStore();
 
-const ExpensesHistory = observer(({ userId }: { userId: number }) => {
-  store.initialLoad(userId);
+const Render = observer(() => {
 
   const totalAmount = store.state.loadedExpenses.reduce(
     (sum, expense) => sum + Number.parseFloat(expense.amount as any),
@@ -153,9 +148,9 @@ const ExpensesHistory = observer(({ userId }: { userId: number }) => {
                         ${expense.amount}
                       </TableCell>
                       <TableCell>
-                        {expense.category || "Sin categoría"}
+                        {expense.category_name || "Sin categoría"}
                       </TableCell>
-                      <TableCell>{expense.name}</TableCell>
+                      <TableCell>{expense.author_name}</TableCell>
                       <TableCell>{expense.date.toLocaleDateString()}</TableCell>
                     </TableRow>
                   );
@@ -167,5 +162,10 @@ const ExpensesHistory = observer(({ userId }: { userId: number }) => {
       </Card>
     </div>
   );
+})
+
+const ExpensesHistory = (({ userId }: { userId: number }) => {
+  store.initialLoad(userId);
+  return <Render />
 });
 export default ExpensesHistory;

@@ -3,26 +3,35 @@
 import { pool } from "@/db";
 
 export type Expense = {
-  author: number;
+  user_id: number;
+  author_name: string;
   concept: string;
   amount: number;
-  category: string;
+  category: number;
+  category_name: string;
   name: string;
   date: Date;
 };
 
 export async function getLastExpenses() {
-  console.log("DATABASE_URL:", process.env.DBHOST);
   const result = await pool.query(
-    `SELECT * FROM expenses JOIN users ON expenses.user_id = users.id WHERE date >= NOW() - INTERVAL '7 days' ORDER BY date DESC`,
+    `SELECT expenses.*, categories.label as category_name, users.name as author_name FROM expenses 
+      JOIN users ON expenses.user_id = users.id 
+      JOIN categories ON expenses.category = categories.id
+      WHERE date >= NOW() - INTERVAL '7 days' 
+      ORDER BY date DESC`,
   );
+  console.log(result.rows);
   return result.rows as Expense[];
 }
 
 export async function getAllExpenses() {
-  console.log("DATABASE_URL:", process.env.DBHOST);
   const result = await pool.query(
-    `SELECT * FROM expenses JOIN users ON expenses.user_id = users.id ORDER BY date DESC`,
+    `SELECT  expenses.*, categories.label as category_name, users.name as author_name FROM expenses 
+      JOIN users ON expenses.user_id = users.id 
+      JOIN categories ON expenses.category = categories.id
+      ORDER BY date DESC`,
   );
+  console.log(result.rows);
   return result.rows as Expense[];
 }
