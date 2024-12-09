@@ -21,7 +21,6 @@ export async function getLastExpenses() {
       WHERE date >= NOW() - INTERVAL '7 days' 
       ORDER BY date DESC`,
   );
-  console.log(result.rows);
   return result.rows as Expense[];
 }
 
@@ -32,6 +31,5 @@ export async function getAllExpenses() {
       JOIN categories ON expenses.category = categories.id
       ORDER BY date DESC`,
   );
-  console.log(result.rows);
   return result.rows as Expense[];
 }

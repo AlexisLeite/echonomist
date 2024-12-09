@@ -1,16 +1,8 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { makeObservable, observable, toJS } from "mobx";
+import { makeObservable, observable } from "mobx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Expense,
   getAllExpenses,
@@ -20,8 +12,10 @@ import { Button } from "./ui/button";
 import { Hearts } from "react-loader-spinner";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
+import { HistoryMobile } from "./expenses/HistoryMobile";
+import { HistoryTable } from "./expenses/HistoryTable";
 
-class HistoryStore {
+export class HistoryStore {
   state: {
     balance?: number;
     firstLoaded: boolean;
@@ -44,9 +38,13 @@ class HistoryStore {
     });
   }
 
-  initialLoad(userId: number) {
-    this.state.userId = userId;
-    this.loadSevenDays();
+  private token: number = 0;
+  initialLoad(token: number, userId: number) {
+    if (token !== this.token) {
+      this.token = token;
+      this.state.userId = userId;
+      this.loadSevenDays();
+    }
   }
 
   async loadSevenDays() {
@@ -84,11 +82,7 @@ class HistoryStore {
 const store = new HistoryStore();
 
 const Render = observer(() => {
-
-  const totalAmount = store.state.loadedExpenses.reduce(
-    (sum, expense) => sum + Number.parseFloat(expense.amount as any),
-    0,
-  );
+  const mobile = (window.innerWidth ?? 1000) < 500;
 
   return (
     <div className="flex-grow pt-16 px-4 sm:px-6 lg:px-8 h-full">
@@ -123,49 +117,25 @@ const Render = observer(() => {
               visible={true}
             />
           )}
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Description </TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Author</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {store.state.loadedExpenses.map((expense) => {
-                  const percentage =
-                    (Number.parseFloat(expense.amount as any) / totalAmount) *
-                    100;
-                  const backgroundColor = `rgba(80 80 183 / ${percentage / 100})`; // Red color with varying opacity
-
-                  return (
-                    <TableRow key={expense.concept}>
-                      <TableCell>{expense.concept} </TableCell>
-                      <TableCell style={{ backgroundColor }}>
-                        ${expense.amount}
-                      </TableCell>
-                      <TableCell>
-                        {expense.category_name || "Sin categoría"}
-                      </TableCell>
-                      <TableCell>{expense.author_name}</TableCell>
-                      <TableCell>{expense.date.toLocaleDateString()}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
+          {mobile ? (
+            <HistoryMobile store={store} />
+          ) : (
+            <HistoryTable store={store} />
+          )}
         </CardContent>
       </Card>
     </div>
   );
-})
-
-const ExpensesHistory = (({ userId }: { userId: number }) => {
-  store.initialLoad(userId);
-  return <Render />
 });
+
+const ExpensesHistory = ({
+  token,
+  userId,
+}: {
+  token: number;
+  userId: number;
+}) => {
+  store.initialLoad(token, userId);
+  return <Render />;
+};
 export default ExpensesHistory;
