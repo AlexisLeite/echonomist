@@ -19,31 +19,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { createExpense } from "@/actions/createExpense";
 import { Alert } from "./ui/alert";
-import { startTransition, useActionState, useState } from "react";
-import { Category, getCategories } from "@/actions/getCategories";
-import { Group } from "@/actions/getUserGroups";
+import { useActionState, useState } from "react";
+import { Category } from "@/actions/getCategories";
 import { LoaderCircle } from "lucide-react";
 
-export function NewExpenseForm({
-  categories,
-  groups,
-}: {
-  categories: Category[];
-  groups: Group[];
-}) {
+export function NewExpenseForm({ categories }: { categories: Category[] }) {
   const [state, formAction, loadingA] = useActionState(createExpense, {
     message: "",
     success: false,
   });
-  const [catsState, getCats, loadingB] = useActionState(
-    getCategories,
-    categories,
-  );
   const [selectedCategory, setSelectedCategory] = useState(
-    String(catsState[0]?.id ?? ""),
+    String(categories[0]?.id ?? ""),
   );
 
-  const isLoading = loadingA || loadingB;
+  const isLoading = loadingA;
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -69,42 +58,17 @@ export function NewExpenseForm({
             <Input name="amount" type="number" min="0" step="0.01" required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="group">Grupo</Label>
-            <Select
-              name="group"
-              defaultValue={String(groups[0]?.id || "")}
-              onValueChange={(value) => {
-                const selectedId = Number.parseInt(value);
-                startTransition(() => {
-                  getCats(selectedId);
-                  setSelectedCategory("");
-                });
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Elije el grupo" />
-              </SelectTrigger>
-              <SelectContent>
-                {groups.map((group) => (
-                  <SelectItem key={group.id} value={String(group.id)}>
-                    {group.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="category">Categoría</Label>
             <Select
               name="category"
-              value={selectedCategory || String(catsState[0]?.id || "")}
+              value={selectedCategory || String(categories[0]?.id || "")}
               onValueChange={setSelectedCategory}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Elije la categoría" />
               </SelectTrigger>
               <SelectContent>
-                {catsState.map((cat) => (
+                {categories.map((cat) => (
                   <SelectItem key={cat.id} value={String(cat.id)}>
                     {cat.label}
                   </SelectItem>

@@ -13,32 +13,75 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SessionPayload } from "@/session/session";
 import { logout } from "@/actions/logout";
+import { Group } from "@/actions/getUserGroups";
+import { startTransition, useActionState } from "react";
+import { setSelectedGroup } from "@/session/setSelectedGroup";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
-export default function Navbar({ session }: { session: SessionPayload }) {
+function makeLink(label: string, href: string) {
+  return (
+    <DropdownMenuItem>
+      <Link href={href}>{label}</Link>
+    </DropdownMenuItem>
+  );
+}
+
+const navItems = [
+  makeLink("Ingresar gasto", "/"),
+  makeLink("Historial", "/history"),
+];
+
+export default function Navbar({
+  groups,
+  session,
+}: {
+  groups: Group[];
+  session: SessionPayload;
+}) {
+  const [selectedGroup, setSelected] = useActionState(
+    setSelectedGroup,
+    session.selectedGroup,
+  );
+
   return (
     <nav className="shadow-sm fixed top-0 left-0 right-0 h-16 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
               <span className="text-xl font-bold ">Echonomist</span>
             </Link>
-            <div className="ml-6 flex space-x-8">
-              <Link
-                href="/"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium  border-b-2 border-transparent hover:border-gray-300 "
-              >
-                Ingresar gasto
-              </Link>
-              <Link
-                href="/history"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium  border-b-2 border-transparent hover:border-gray-300 "
-              >
-                Historial
-              </Link>
-            </div>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
+            <div className="mr-3">
+              <Select
+                name="group"
+                value={String(selectedGroup)}
+                onValueChange={(value) => {
+                  const selectedId = Number.parseInt(value);
+                  startTransition(() => {
+                    setSelected(selectedId);
+                  });
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Elije el grupo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {groups.map((group) => (
+                    <SelectItem key={group.id} value={String(group.id)}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -71,6 +114,8 @@ export default function Navbar({ session }: { session: SessionPayload }) {
                     </p>
                   </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {...navItems}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
               </DropdownMenuContent>

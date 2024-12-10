@@ -8,6 +8,7 @@ export type SessionPayload = {
   userId: string;
   userName: string;
   userEmail: string;
+  selectedGroup: number;
 };
 
 const secretKey = process.env.SECRET;
@@ -32,13 +33,9 @@ export async function decrypt(session: string | undefined = "") {
   }
 }
 
-export async function createSession(
-  userId: string,
-  userName: string,
-  userEmail: string,
-) {
+export async function createSession(data: SessionPayload) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const session = await encrypt({ userId, userName, userEmail });
+  const session = await encrypt(data);
   (await cookies()).set("session", session, {
     httpOnly: true,
     secure: true,

@@ -6,5 +6,5 @@ export default async function Home() {
   const groups = await getUserGroups();
   const categories = await getCategories([], groups[0].id);
 
-  return <NewExpenseForm categories={categories} groups={groups} />;
+  return <NewExpenseForm categories={categories} />;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { observer } from "mobx-react-lite";
-import { makeObservable, observable } from "mobx";
+import { makeAutoObservable } from "mobx";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Expense,
@@ -14,6 +14,8 @@ import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { AlertCircle } from "lucide-react";
 import { HistoryMobile } from "./expenses/HistoryMobile";
 import { HistoryTable } from "./expenses/HistoryTable";
+import { useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export class HistoryStore {
   state: {
@@ -33,9 +35,7 @@ export class HistoryStore {
     userId: -1,
   };
   constructor() {
-    makeObservable(this, {
-      state: observable,
-    });
+    makeAutoObservable(this);
   }
 
   private token: number = 0;
@@ -82,7 +82,7 @@ export class HistoryStore {
 const store = new HistoryStore();
 
 const Render = observer(() => {
-  const mobile = (window?.innerWidth ?? 1000) < 500;
+  const mobile = useIsMobile();
 
   return (
     <div className="flex-grow pt-16 px-4 sm:px-6 lg:px-8 h-full">
@@ -135,7 +135,9 @@ const ExpensesHistory = ({
   token: number;
   userId: number;
 }) => {
-  store.initialLoad(token, userId);
+  useEffect(() => {
+    store.initialLoad(token, userId);
+  });
   return <Render />;
 };
 export default ExpensesHistory;

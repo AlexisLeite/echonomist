@@ -2,6 +2,7 @@
 
 import { pool } from "@/db";
 import { verifySession } from "@/session/session";
+import { updateActiveGroup } from "./updateActiveGroup";
 
 export type Category = {
   id: number;
@@ -13,6 +14,7 @@ export async function getCategories(state: any, groupId: number) {
   const session = await verifySession();
 
   if (session.isAuth) {
+    updateActiveGroup(groupId);
     return (
       (
         await pool.query(

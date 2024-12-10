@@ -9,9 +9,9 @@ export type Group = {
   public: boolean;
 };
 
-export async function getUserGroups() {
-  const session = await verifySession();
-  if (!session.isAuth) {
+export async function getUserGroups(userId?: number) {
+  const actualId = userId || (await verifySession())?.userId;
+  if (actualId === undefined) {
     return [];
   }
 
@@ -19,7 +19,7 @@ export async function getUserGroups() {
     (
       await pool.query(
         `select g.* from users_groups ug join groups g on ug.group_id = g.id and ug.user_id = $1`,
-        [session.userId],
+        [actualId],
       )
     ).rows as Group[]
   ).sort((a, b) => (a.name < b.name ? -1 : 1));

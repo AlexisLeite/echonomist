@@ -2,8 +2,10 @@
 
 import localFont from "next/font/local";
 import "./globals.css";
+import "./index.sass";
 import { verifySession } from "@/session/session";
 import Navbar from "@/components/NavBar";
+import { getUserGroups } from "@/actions/getUserGroups";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,6 +24,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await verifySession();
+  const groups = await getUserGroups();
 
   return (
     <html className="dark" lang="en">
@@ -29,7 +32,9 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="flex items-center justify-center min-h-screen">
-          {session.userId !== undefined && <Navbar session={session} />}
+          {session.userId !== undefined && (
+            <Navbar groups={groups} session={session} />
+          )}
           <div className="flex-grow pt-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
             {children}
           </div>
