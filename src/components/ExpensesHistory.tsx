@@ -82,7 +82,7 @@ export class HistoryStore {
 const store = new HistoryStore();
 
 const Render = observer(() => {
-  const mobile = (window.innerWidth ?? 1000) < 500;
+  const mobile = (window?.innerWidth ?? 1000) < 500;
 
   return (
     <div className="flex-grow pt-16 px-4 sm:px-6 lg:px-8 h-full">
